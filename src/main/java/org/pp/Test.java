@@ -4,12 +4,9 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartPanel;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
-import org.jfree.chart.plot.XYPlot;
-import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.nd4j.linalg.api.ndarray.INDArray;
@@ -17,23 +14,20 @@ import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.dataset.api.iterator.BaseDatasetIterator;
 import org.nd4j.linalg.dataset.api.preprocessor.NormalizerMinMaxScaler;
 import org.pp.data.StockCSVDataSetFetcher;
-import org.pp.nn.NeuralNetwork;
 
-import java.awt.*;
 import java.io.File;
+
 @Slf4j
 public class Test {
 
     static int inpNum = 100;
-    static int outNum = 10;
+    static int outNum = 20;
 
     @SneakyThrows
     public static void main(String[] args) {
         NormalizerMinMaxScaler normalizer = new NormalizerMinMaxScaler(-1,1);
 
         File csvFile = new File("A_data.csv");
-
-
 
         MultiLayerNetwork network = MultiLayerNetwork.load(new File("network.zip"), true);
         network.init();
@@ -47,7 +41,7 @@ public class Test {
 
         INDArray output = network.output(dataSet.getFeatures());
 
-        log.info("score: "+network.score());
+        //log.info("score: "+network.score());
         normalizer.revert(dataSet);
         normalizer.revertLabels(output);
 
@@ -80,10 +74,9 @@ public class Test {
         INDArray expOutput= dataSet.getLabels();
 
         for (int i = 0; i < inpNum; i++)
-            expectedSeries.add(i, expInput.getDouble(0,i,0));
-
+            expectedSeries.add(i, expInput.getDouble(0, i, 0));
         for (int i = 0; i < outNum; i++)
-            expectedSeries.add(i+inpNum, expOutput.getDouble(0,i));
+            expectedSeries.add(i+inpNum, expOutput.getDouble(0, i, 0));
 
         return expectedSeries;
     }

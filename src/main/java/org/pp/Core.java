@@ -23,11 +23,10 @@ public class Core {
         File csvFile = new File("A_data.csv");
 
         int inpNum = 100;
-        int outNum = 20;
+        int outNum = 10;
 
         MultiLayerNetwork network = NeuralNetwork.getNetModel(inpNum, outNum);
         network.init();
-
 
         BaseDatasetIterator datasetIterator = new BaseDatasetIterator(32,64, new StockCSVDataSetFetcher(csvFile, inpNum, outNum));
         normalizer.fit(datasetIterator);
@@ -35,25 +34,23 @@ public class Core {
 
         uiServerComponent.reinitialize(network);
 
-        int epochNum = 1000;
+        int epochNum = 3000;
 
         for (int i = 0; i < epochNum; i++) {
 
             double lr = calcLearningRate(i);
 
-            network.setLearningRate(calcLearningRate(i));
+            network.setLearningRate(lr);
             network.fit(datasetIterator);
 
             log.info("Epoch "+i+"; lr:"+lr+" score:"+network.score()+";");
 
             System.gc();
         }
-
         network.save(new File("network.zip"));
     }
 
-
     private static double calcLearningRate(int epochNum){
-        return epochNum <= 700 ? 1e-3 : 1e-4;
+        return epochNum <= 2000 ? 1e-3 : 1e-4;
     }
 }
