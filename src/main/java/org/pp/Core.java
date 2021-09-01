@@ -16,7 +16,7 @@ import java.io.File;
 public class Core {
     @SneakyThrows
     public static void main(String[] args) {
-        NormalizerMinMaxScaler normalizer = new NormalizerMinMaxScaler(-1,1);
+        NormalizerMinMaxScaler normalizer = new NormalizerMinMaxScaler(0.0, 1.0);
 
         UIServerComponent uiServerComponent = new UIServerComponent();
 
@@ -28,7 +28,7 @@ public class Core {
         MultiLayerNetwork network = NeuralNetwork.getNetModel(inpNum, outNum);
         network.init();
 
-        BaseDatasetIterator datasetIterator = new BaseDatasetIterator(32,64, new StockCSVDataSetFetcher(csvFile, inpNum, outNum));
+        BaseDatasetIterator datasetIterator = new BaseDatasetIterator(32,256, new StockCSVDataSetFetcher(csvFile, inpNum, outNum));
         normalizer.fit(datasetIterator);
         datasetIterator.setPreProcessor(normalizer);
 
@@ -37,13 +37,10 @@ public class Core {
         int epochNum = 3000;
 
         for (int i = 0; i < epochNum; i++) {
-
             double lr = calcLearningRate(i);
 
             network.setLearningRate(lr);
             network.fit(datasetIterator);
-
-            log.info("Epoch "+i+"; lr:"+lr+" score:"+network.score()+";");
 
             System.gc();
         }

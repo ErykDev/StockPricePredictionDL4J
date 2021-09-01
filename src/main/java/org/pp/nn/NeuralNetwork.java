@@ -17,10 +17,10 @@ import org.nd4j.linalg.lossfunctions.LossFunctions;
 public class NeuralNetwork {
     //create the neural network
     public static MultiLayerNetwork getNetModel(int inputNum, int outNum) {
-
+        int hiddenLayerNum = 100;
 
         MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder()
-                .trainingWorkspaceMode(WorkspaceMode.ENABLED).inferenceWorkspaceMode(WorkspaceMode.ENABLED)
+                //.trainingWorkspaceMode(WorkspaceMode.ENABLED).inferenceWorkspaceMode(WorkspaceMode.ENABLED)
                 .optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT)
                 .weightInit(WeightInit.XAVIER)
                 .updater(new Adam())
@@ -30,20 +30,29 @@ public class NeuralNetwork {
                         .activation(Activation.TANH)
                         .dropOut(0.2)
                         .nIn(inputNum)
-                        .nOut(100).build())
+                        .nOut(hiddenLayerNum).build())
 
                 .layer(new LSTM.Builder().name("LSTM2")
                         .activation(Activation.TANH)
                         .dropOut(0.2)
-                        .nOut(100).build())
+                        .nIn(hiddenLayerNum)
+                        .nOut(hiddenLayerNum).build())
 
                 .layer(new LSTM.Builder().name("LSTM3")
                         .activation(Activation.TANH)
                         .dropOut(0.2)
-                        .nOut(100).build())
+                        .nIn(hiddenLayerNum)
+                        .nOut(hiddenLayerNum).build())
+
+                .layer(new LSTM.Builder().name("LSTM4")
+                        .activation(Activation.TANH)
+                        .dropOut(0.2)
+                        .nIn(hiddenLayerNum)
+                        .nOut(hiddenLayerNum).build())
 
                 .layer(new RnnOutputLayer.Builder(LossFunctions.LossFunction.MSE)
                         .activation(Activation.IDENTITY)
+                        .nIn(hiddenLayerNum)
                         .nOut(outNum).build())
                 .build();
 
