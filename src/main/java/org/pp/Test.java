@@ -1,6 +1,7 @@
 package org.pp;
 
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
@@ -20,7 +21,7 @@ import org.pp.nn.NeuralNetwork;
 
 import java.awt.*;
 import java.io.File;
-
+@Slf4j
 public class Test {
 
     static int inpNum = 100;
@@ -46,6 +47,7 @@ public class Test {
 
         INDArray output = network.output(dataSet.getFeatures());
 
+        log.info("score: "+network.score());
         normalizer.revert(dataSet);
         normalizer.revertLabels(output);
 

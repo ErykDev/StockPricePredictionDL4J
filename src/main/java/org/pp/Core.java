@@ -35,7 +35,7 @@ public class Core {
 
         uiServerComponent.reinitialize(network);
 
-        int epochNum = 300;
+        int epochNum = 1000;
 
         for (int i = 0; i < epochNum; i++) {
 
@@ -54,6 +54,6 @@ public class Core {
 
 
     private static double calcLearningRate(int epochNum){
-        return epochNum <= 200 ? 1e-3 : 1e-4;
+        return epochNum <= 700 ? 1e-3 : 1e-4;
     }
 }
