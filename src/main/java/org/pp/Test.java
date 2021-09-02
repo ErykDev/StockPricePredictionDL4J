@@ -13,6 +13,8 @@ import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.dataset.api.iterator.BaseDatasetIterator;
 import org.nd4j.linalg.dataset.api.preprocessor.NormalizerMinMaxScaler;
+import org.nd4j.linalg.factory.Nd4j;
+import org.pp.data.CustomDataPrePreprocessor;
 import org.pp.data.StockCSVDataSetFetcher;
 
 import java.io.File;
@@ -20,34 +22,30 @@ import java.io.File;
 @Slf4j
 public class Test {
 
-    static int inpNum = 100;
+    static int inpNum = 50;
     static int outNum = 20;
+    static CustomDataPrePreprocessor normalizer = new CustomDataPrePreprocessor();
 
     @SneakyThrows
     public static void main(String[] args) {
-        NormalizerMinMaxScaler normalizer = new NormalizerMinMaxScaler(-1,1);
-
         File csvFile = new File("A_data.csv");
 
         MultiLayerNetwork network = MultiLayerNetwork.load(new File("network.zip"), true);
         network.init();
 
         BaseDatasetIterator datasetIterator = new BaseDatasetIterator(1,10, new StockCSVDataSetFetcher(csvFile, inpNum, outNum));
-        normalizer.fit(datasetIterator);
+
         datasetIterator.setPreProcessor(normalizer);
 
 
         DataSet dataSet = datasetIterator.next();
 
-        INDArray output = network.output(dataSet.getFeatures());
+        INDArray output = getPredictionSteps(network, dataSet.getFeatures(), outNum);
 
-        //log.info("score: "+network.score());
         normalizer.revert(dataSet);
-        normalizer.revertLabels(output);
+        output = normalizer.revert(output);
 
-
-
-        final XYSeriesCollection dataset = new XYSeriesCollection( );
+        final XYSeriesCollection dataset = new XYSeriesCollection();
         dataset.addSeries(generateExpectedXYSeries(dataSet));
         dataset.addSeries(generateOutputXYSeries(output));
 
@@ -67,8 +65,30 @@ public class Test {
         ChartUtilities.saveChartAsJPEG( XYChart, xylineChart, width, height);
     }
 
+    private static INDArray getPredictionSteps(MultiLayerNetwork network, INDArray input, int steps){
+
+        INDArray tempInput = input.dup();
+
+        INDArray stepsValues = Nd4j.create(1,steps);
+
+        for (int i = 0; i < steps; i++) {
+            double output = network.output(tempInput).getDouble(0,0);
+
+            stepsValues.putScalar(0,i, output);
+
+            //moving array by 1 pos
+            for (int j = 0; j < inpNum-1; j++)
+                tempInput.putScalar(0, j,0, tempInput.getDouble(0, j+1, 0));
+
+            //adding predicted output
+            tempInput.putScalar(0,inpNum-1,0, output);
+        }
+
+        return stepsValues;
+    }
+
     private static XYSeries generateExpectedXYSeries(DataSet dataSet){
-        XYSeries expectedSeries = new XYSeries( "Expected" );
+        XYSeries expectedSeries = new XYSeries("Expected");
 
         INDArray expInput = dataSet.getFeatures();
         INDArray expOutput= dataSet.getLabels();
@@ -82,7 +102,7 @@ public class Test {
     }
 
     private static XYSeries generateOutputXYSeries(INDArray expOutput){
-        XYSeries expectedSeries = new XYSeries( "Predicted" );
+        XYSeries expectedSeries = new XYSeries("Predicted");
 
         for (int i = 0; i < outNum; i++)
             expectedSeries.add(i+inpNum, expOutput.getDouble(0,i));

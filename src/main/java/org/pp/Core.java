@@ -5,8 +5,8 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.nd4j.linalg.dataset.api.iterator.BaseDatasetIterator;
-import org.nd4j.linalg.dataset.api.preprocessor.NormalizerMinMaxScaler;
 import org.pp.component.UIServerComponent;
+import org.pp.data.CustomDataPrePreprocessor;
 import org.pp.data.StockCSVDataSetFetcher;
 import org.pp.nn.NeuralNetwork;
 import java.io.File;
@@ -16,20 +16,19 @@ import java.io.File;
 public class Core {
     @SneakyThrows
     public static void main(String[] args) {
-        NormalizerMinMaxScaler normalizer = new NormalizerMinMaxScaler(0.0, 1.0);
+        CustomDataPrePreprocessor normalizer = new CustomDataPrePreprocessor();
 
         UIServerComponent uiServerComponent = new UIServerComponent();
 
         File csvFile = new File("A_data.csv");
 
-        int inpNum = 100;
-        int outNum = 10;
+        int inpNum = 50;
+        int outNum = 1;
 
         MultiLayerNetwork network = NeuralNetwork.getNetModel(inpNum, outNum);
         network.init();
 
-        BaseDatasetIterator datasetIterator = new BaseDatasetIterator(32,256, new StockCSVDataSetFetcher(csvFile, inpNum, outNum));
-        normalizer.fit(datasetIterator);
+        BaseDatasetIterator datasetIterator = new BaseDatasetIterator(32,64, new StockCSVDataSetFetcher(csvFile, inpNum, outNum));
         datasetIterator.setPreProcessor(normalizer);
 
         uiServerComponent.reinitialize(network);

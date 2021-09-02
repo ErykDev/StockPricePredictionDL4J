@@ -7,7 +7,6 @@ import org.deeplearning4j.nn.conf.WorkspaceMode;
 import org.deeplearning4j.nn.conf.layers.DenseLayer;
 import org.deeplearning4j.nn.conf.layers.LSTM;
 import org.deeplearning4j.nn.conf.layers.OutputLayer;
-import org.deeplearning4j.nn.conf.layers.RnnOutputLayer;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.nn.weights.WeightInit;
 import org.nd4j.linalg.activations.Activation;
@@ -17,10 +16,10 @@ import org.nd4j.linalg.lossfunctions.LossFunctions;
 public class NeuralNetwork {
     //create the neural network
     public static MultiLayerNetwork getNetModel(int inputNum, int outNum) {
-        int hiddenLayerNum = 100;
+        int hiddenLayerNum = 50;
 
         MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder()
-                //.trainingWorkspaceMode(WorkspaceMode.ENABLED).inferenceWorkspaceMode(WorkspaceMode.ENABLED)
+                .trainingWorkspaceMode(WorkspaceMode.ENABLED).inferenceWorkspaceMode(WorkspaceMode.ENABLED)
                 .optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT)
                 .weightInit(WeightInit.XAVIER)
                 .updater(new Adam())
@@ -50,10 +49,14 @@ public class NeuralNetwork {
                         .nIn(hiddenLayerNum)
                         .nOut(hiddenLayerNum).build())
 
-                .layer(new RnnOutputLayer.Builder(LossFunctions.LossFunction.MSE)
+                .layer(new DenseLayer.Builder().name("Dense1")
                         .activation(Activation.IDENTITY)
-                        .nIn(hiddenLayerNum)
                         .nOut(outNum).build())
+
+                .layer(new OutputLayer.Builder().name("output")
+                        .activation(Activation.IDENTITY)
+                        .nOut(outNum).lossFunction(LossFunctions.LossFunction.MSE)
+                        .build())
                 .build();
 
         return new MultiLayerNetwork(conf);
