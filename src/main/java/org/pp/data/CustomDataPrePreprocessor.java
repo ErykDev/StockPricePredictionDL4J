@@ -21,8 +21,12 @@ public class CustomDataPrePreprocessor implements DataSetPreProcessor {
             biggestNum = Math.max(v1, v2);
         }
 
-        toPreProcess.setFeatures(toPreProcess.getFeatures().div(biggestNum));
-        toPreProcess.setLabels(toPreProcess.getLabels().div(biggestNum));
+        toPreProcess.setFeatures(preProcess(toPreProcess.getFeatures()));
+        toPreProcess.setLabels(preProcess(toPreProcess.getLabels()));
+    }
+
+    public INDArray preProcess(INDArray toPreProcess) {
+        return toPreProcess.div(biggestNum);
     }
 
     public void revert(DataSet toRevert){
