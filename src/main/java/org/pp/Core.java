@@ -33,13 +33,14 @@ public class Core {
 
         uiServerComponent.reinitialize(network);
 
-        int epochNum = 100;
+        int epochNum = 1000;
 
         for (int i = 0; i < epochNum; i++) {
             double lr = calcLearningRate(i);
 
             network.setLearningRate(lr);
             network.fit(datasetIterator);
+            log.info(String.format("Epoch: %s", i));
 
             System.gc();
         }
@@ -47,6 +48,6 @@ public class Core {
     }
 
     private static double calcLearningRate(int epochNum){
-        return epochNum <= 70 ? 1e-3 : 1e-4;
+        return epochNum <= 700 ? 1e-3 : 1e-4;
     }
 }

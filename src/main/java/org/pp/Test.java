@@ -44,7 +44,6 @@ public class Test {
         INDArray output = getPredictionSteps(network, dataSet.getFeatures(), outNum);
 
         normalizer.revert(dataSet);
-        output = normalizer.revert(output);
 
         final XYSeriesCollection dataset = new XYSeriesCollection();
         dataset.addSeries(generateExpectedXYSeries(dataSet));
@@ -69,12 +68,12 @@ public class Test {
     private static INDArray getPredictionSteps(MultiLayerNetwork network, INDArray input, int steps){
 
         INDArray tempInput = input.dup();
-        INDArray stepsValues = Nd4j.create(1,steps);
+        INDArray stepsValues = Nd4j.create(1, steps, 1);
 
         for (int i = 0; i < steps; i++) {
             double output = network.output(tempInput).getDouble(0,0);
 
-            stepsValues.putScalar(0,i, output);
+            stepsValues.putScalar(0, i,0, output * normalizer.getBiggestNum());
 
             //moving array by 1 pos
             for (int j = 0; j < inpNum-1; j++)
@@ -107,7 +106,7 @@ public class Test {
         XYSeries expectedSeries = new XYSeries("Predicted");
 
         for (int i = 0; i < outNum; i++)
-            expectedSeries.add(i+inpNum, expOutput.getDouble(0,i));
+            expectedSeries.add(i+inpNum, expOutput.getDouble(0, i, 0));
 
         return expectedSeries;
     }

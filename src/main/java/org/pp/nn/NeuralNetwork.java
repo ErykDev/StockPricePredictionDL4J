@@ -4,9 +4,7 @@ import org.deeplearning4j.nn.api.OptimizationAlgorithm;
 import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
 import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
 import org.deeplearning4j.nn.conf.WorkspaceMode;
-import org.deeplearning4j.nn.conf.layers.DenseLayer;
-import org.deeplearning4j.nn.conf.layers.LSTM;
-import org.deeplearning4j.nn.conf.layers.OutputLayer;
+import org.deeplearning4j.nn.conf.layers.*;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.nn.weights.WeightInit;
 import org.nd4j.linalg.activations.Activation;
@@ -43,14 +41,10 @@ public class NeuralNetwork {
                         .nIn(hiddenLayerNum)
                         .nOut(hiddenLayerNum).build())
 
-                .layer(new DenseLayer.Builder().name("Dense1")
+                .layer(new RnnOutputLayer.Builder(LossFunctions.LossFunction.MSE)
                         .activation(Activation.IDENTITY)
+                        .nIn(hiddenLayerNum)
                         .nOut(outNum).build())
-
-                .layer(new OutputLayer.Builder().name("output")
-                        .activation(Activation.IDENTITY)
-                        .nOut(outNum).lossFunction(LossFunctions.LossFunction.MSE)
-                        .build())
                 .build();
 
         return new MultiLayerNetwork(conf);
