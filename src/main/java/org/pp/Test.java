@@ -28,19 +28,20 @@ public class Test {
 
     @SneakyThrows
     public static void main(String[] args) {
-        File csvFile = new File("A_data.csv");
+        File csvFile = new File("NSE-TATAGLOBAL.csv");
 
         MultiLayerNetwork network = MultiLayerNetwork.load(new File("network.zip"), true);
         network.init();
 
-        BaseDatasetIterator datasetIterator = new BaseDatasetIterator(1,10, new StockCSVDataSetFetcher(csvFile, inpNum, outNum));
+        StockCSVDataSetFetcher dataSetFetcher = new StockCSVDataSetFetcher(csvFile, inpNum, outNum);
+        BaseDatasetIterator datasetIterator = new BaseDatasetIterator(1, dataSetFetcher.totalExamples(), new StockCSVDataSetFetcher(csvFile, inpNum, outNum));
 
         datasetIterator.setPreProcessor(normalizer);
 
 
         DataSet dataSet = datasetIterator.next();
 
-        INDArray output = getPredictionSteps(network, dataSet.getFeatures(), outNum);
+        INDArray output = network.output(dataSet.getFeatures());
 
         normalizer.revert(dataSet);
         output = normalizer.revert(output);
@@ -65,28 +66,6 @@ public class Test {
         ChartUtilities.saveChartAsJPEG( XYChart, xylineChart, width, height);
     }
 
-    private static INDArray getPredictionSteps(MultiLayerNetwork network, INDArray input, int steps){
-
-        INDArray tempInput = input.dup();
-
-        INDArray stepsValues = Nd4j.create(1,steps);
-
-        for (int i = 0; i < steps; i++) {
-            double output = network.output(tempInput).getDouble(0,0);
-
-            stepsValues.putScalar(0,i, output);
-
-            //moving array by 1 pos
-            for (int j = 0; j < inpNum-1; j++)
-                tempInput.putScalar(0, j,0, tempInput.getDouble(0, j+1, 0));
-
-            //adding predicted output
-            tempInput.putScalar(0,inpNum-1,0, output);
-        }
-
-        return stepsValues;
-    }
-
     private static XYSeries generateExpectedXYSeries(DataSet dataSet){
         XYSeries expectedSeries = new XYSeries("Expected");
 
@@ -109,5 +88,4 @@ public class Test {
 
         return expectedSeries;
     }
-
 }

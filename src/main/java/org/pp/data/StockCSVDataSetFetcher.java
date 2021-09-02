@@ -87,13 +87,13 @@ public class StockCSVDataSetFetcher implements DataSetFetcher {
 
             //2013-02-08,45.07,45.35,45.0,45.08,1824755,A
             for (int j = 0; j < inputColumns; j++){
-                double val = Double.parseDouble(allLines.get(ReaderCursor + j + i).split(",")[4]);
+                double val = Double.parseDouble(allLines.get(ReaderCursor + j + i).split(",")[5]);
 
                 input.putScalar(0, j,0, val);
             }
 
             for (int z = 0; z < totalOutcomes; z++){
-                double val = Double.parseDouble(allLines.get(ReaderCursor + inputColumns + z + i).split(",")[4]);
+                double val = Double.parseDouble(allLines.get(ReaderCursor + inputColumns + z + i).split(",")[5]);
 
                 output.putScalar(0, z, val);
             }

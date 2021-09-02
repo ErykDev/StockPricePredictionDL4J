@@ -5,8 +5,6 @@ import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.api.DataSet;
 import org.nd4j.linalg.dataset.api.DataSetPreProcessor;
 
-import java.util.Objects;
-
 public class CustomDataPrePreprocessor implements DataSetPreProcessor {
 
     @Getter
@@ -14,7 +12,7 @@ public class CustomDataPrePreprocessor implements DataSetPreProcessor {
 
     @Override
     public void preProcess(DataSet toPreProcess) {
-        if (biggestNum == 0.0){
+        if (biggestNum == 0.0) {
             double v1 = toPreProcess.getFeatures().maxNumber().doubleValue();
             double v2 = toPreProcess.getLabels().maxNumber().doubleValue();
 

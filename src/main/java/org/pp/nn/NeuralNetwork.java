@@ -43,12 +43,6 @@ public class NeuralNetwork {
                         .nIn(hiddenLayerNum)
                         .nOut(hiddenLayerNum).build())
 
-                .layer(new LSTM.Builder().name("LSTM4")
-                        .activation(Activation.TANH)
-                        .dropOut(0.2)
-                        .nIn(hiddenLayerNum)
-                        .nOut(hiddenLayerNum).build())
-
                 .layer(new DenseLayer.Builder().name("Dense1")
                         .activation(Activation.IDENTITY)
                         .nOut(outNum).build())

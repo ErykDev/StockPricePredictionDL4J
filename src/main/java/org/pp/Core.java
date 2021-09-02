@@ -1,6 +1,5 @@
 package org.pp;
 
-
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
@@ -11,7 +10,6 @@ import org.pp.data.StockCSVDataSetFetcher;
 import org.pp.nn.NeuralNetwork;
 import java.io.File;
 
-
 @Slf4j
 public class Core {
     @SneakyThrows
@@ -20,22 +18,22 @@ public class Core {
 
         UIServerComponent uiServerComponent = new UIServerComponent();
 
-        File csvFile = new File("A_data.csv");
+        File csvFile = new File("NSE-TATAGLOBAL.csv");
 
         int inpNum = 50;
-        int outNum = 1;
+        int outNum = 20;
 
         MultiLayerNetwork network = NeuralNetwork.getNetModel(inpNum, outNum);
         network.init();
 
         StockCSVDataSetFetcher dataSetFetcher = new StockCSVDataSetFetcher(csvFile, inpNum, outNum);
 
-        BaseDatasetIterator datasetIterator = new BaseDatasetIterator(8, dataSetFetcher.totalExamples(), new StockCSVDataSetFetcher(csvFile, inpNum, outNum));
+        BaseDatasetIterator datasetIterator = new BaseDatasetIterator(4, dataSetFetcher.totalExamples(), new StockCSVDataSetFetcher(csvFile, inpNum, outNum));
         datasetIterator.setPreProcessor(normalizer);
 
         uiServerComponent.reinitialize(network);
 
-        int epochNum = 1000;
+        int epochNum = 100;
 
         for (int i = 0; i < epochNum; i++) {
             double lr = calcLearningRate(i);
@@ -49,6 +47,6 @@ public class Core {
     }
 
     private static double calcLearningRate(int epochNum){
-        return epochNum <= 700 ? 1e-3 : 1e-4;
+        return epochNum <= 70 ? 1e-3 : 1e-4;
     }
 }
