@@ -21,14 +21,14 @@ public class Core {
         File csvFile = new File("NSE-TATAGLOBAL.csv");
 
         int inpNum = 50;
-        int outNum = 20;
+        int outNum = 1;
 
         MultiLayerNetwork network = NeuralNetwork.getNetModel(inpNum, outNum);
         network.init();
 
         StockCSVDataSetFetcher dataSetFetcher = new StockCSVDataSetFetcher(csvFile, inpNum, outNum);
 
-        BaseDatasetIterator datasetIterator = new BaseDatasetIterator(4, dataSetFetcher.totalExamples(), new StockCSVDataSetFetcher(csvFile, inpNum, outNum));
+        BaseDatasetIterator datasetIterator = new BaseDatasetIterator(1, dataSetFetcher.totalExamples(), new StockCSVDataSetFetcher(csvFile, inpNum, outNum));
         datasetIterator.setPreProcessor(normalizer);
 
         uiServerComponent.reinitialize(network);
