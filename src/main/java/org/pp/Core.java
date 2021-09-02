@@ -28,12 +28,14 @@ public class Core {
         MultiLayerNetwork network = NeuralNetwork.getNetModel(inpNum, outNum);
         network.init();
 
-        BaseDatasetIterator datasetIterator = new BaseDatasetIterator(32,64, new StockCSVDataSetFetcher(csvFile, inpNum, outNum));
+        StockCSVDataSetFetcher dataSetFetcher = new StockCSVDataSetFetcher(csvFile, inpNum, outNum);
+
+        BaseDatasetIterator datasetIterator = new BaseDatasetIterator(8, dataSetFetcher.totalExamples(), new StockCSVDataSetFetcher(csvFile, inpNum, outNum));
         datasetIterator.setPreProcessor(normalizer);
 
         uiServerComponent.reinitialize(network);
 
-        int epochNum = 3000;
+        int epochNum = 1000;
 
         for (int i = 0; i < epochNum; i++) {
             double lr = calcLearningRate(i);
@@ -47,6 +49,6 @@ public class Core {
     }
 
     private static double calcLearningRate(int epochNum){
-        return epochNum <= 2000 ? 1e-3 : 1e-4;
+        return epochNum <= 700 ? 1e-3 : 1e-4;
     }
 }
