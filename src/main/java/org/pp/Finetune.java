@@ -11,7 +11,7 @@ import org.pp.nn.NeuralNetwork;
 import java.io.File;
 
 @Slf4j
-public class Core {
+public class Finetune {
     @SneakyThrows
     public static void main(String[] args) {
         CustomDataPrePreprocessor normalizer = new CustomDataPrePreprocessor();
@@ -37,10 +37,13 @@ public class Core {
 
         for (int i = 0; i < epochNum; i++) {
             network.fit(datasetIterator);
+
             log.info(String.format("Epoch: %s", i));
 
+            network.rnnClearPreviousState();
             System.gc();
         }
+
         network.save(new File("network.zip"));
     }
 }
