@@ -5,12 +5,14 @@ import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.api.DataSet;
 import org.nd4j.linalg.dataset.api.DataSetPreProcessor;
 import org.nd4j.linalg.dataset.api.iterator.BaseDatasetIterator;
-import org.nd4j.linalg.dataset.api.iterator.fetcher.DataSetFetcher;
 
 public class CustomDataPrePreprocessor implements DataSetPreProcessor {
 
     @Getter
-    double biggestNum;
+    double biggestNum = 0.0;
+
+    @Getter
+    double smallestNum = 0.0;
 
     @Override
     public void preProcess(DataSet toPreProcess) {
@@ -29,10 +31,8 @@ public class CustomDataPrePreprocessor implements DataSetPreProcessor {
             if (tempBiggestNum > biggestNum)
                 this.biggestNum = tempBiggestNum;
         }
-    }
 
-    public INDArray preProcess(INDArray toPreProcess) {
-        return toPreProcess.div(biggestNum);
+        iter.reset();
     }
 
     public void revert(DataSet toRevert){
@@ -41,6 +41,10 @@ public class CustomDataPrePreprocessor implements DataSetPreProcessor {
     }
 
     public INDArray revert(INDArray toRevert){
-        return toRevert.mul(biggestNum);
+        return toRevert.add(1.0).div(2.0).mul(biggestNum);
+    }
+
+    public INDArray preProcess(INDArray toPreProcess) {
+        return toPreProcess.div(biggestNum).mul(2.0).sub(1.0);
     }
 }
