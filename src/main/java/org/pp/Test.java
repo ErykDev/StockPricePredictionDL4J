@@ -12,7 +12,6 @@ import org.jfree.data.xy.XYSeriesCollection;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.dataset.api.iterator.BaseDatasetIterator;
-import org.nd4j.linalg.dataset.api.preprocessor.NormalizerMinMaxScaler;
 import org.nd4j.linalg.factory.Nd4j;
 import org.pp.data.CustomDataPrePreprocessor;
 import org.pp.data.StockCSVDataSetFetcher;
@@ -34,8 +33,9 @@ public class Test {
         network.init();
 
         StockCSVDataSetFetcher dataSetFetcher = new StockCSVDataSetFetcher(csvFile, inpNum, outNum);
-        BaseDatasetIterator datasetIterator = new BaseDatasetIterator(1, dataSetFetcher.totalExamples(), new StockCSVDataSetFetcher(csvFile, inpNum, outNum));
 
+        BaseDatasetIterator datasetIterator = new BaseDatasetIterator(1, dataSetFetcher.totalExamples(), new StockCSVDataSetFetcher(csvFile, inpNum, outNum));
+        normalizer.fit(datasetIterator);
         datasetIterator.setPreProcessor(normalizer);
 
 
@@ -44,6 +44,7 @@ public class Test {
         INDArray output = getPredictionSteps(network, dataSet.getFeatures(), outNum);
 
         normalizer.revert(dataSet);
+        output = normalizer.revert(output);
 
         final XYSeriesCollection dataset = new XYSeriesCollection();
         dataset.addSeries(generateExpectedXYSeries(dataSet));
@@ -51,7 +52,7 @@ public class Test {
 
 
         JFreeChart xylineChart = ChartFactory.createXYLineChart(
-                "Predictions" ,
+                "NSE-TATAGLOBAL" ,
                 "X" ,
                 "Price" ,
                 dataset ,
@@ -68,12 +69,12 @@ public class Test {
     private static INDArray getPredictionSteps(MultiLayerNetwork network, INDArray input, int steps){
 
         INDArray tempInput = input.dup();
-        INDArray stepsValues = Nd4j.create(1, steps, 1);
+        INDArray stepsValues = Nd4j.create(steps);
 
         for (int i = 0; i < steps; i++) {
-            double output = network.output(tempInput).getDouble(0,0);
+            double output = network.output(tempInput).getDouble(0, 0, 0);
 
-            stepsValues.putScalar(0, i,0, output * normalizer.getBiggestNum());
+            stepsValues.putScalar(i, output);
 
             //moving array by 1 pos
             for (int j = 0; j < inpNum-1; j++)
@@ -106,7 +107,7 @@ public class Test {
         XYSeries expectedSeries = new XYSeries("Predicted");
 
         for (int i = 0; i < outNum; i++)
-            expectedSeries.add(i+inpNum, expOutput.getDouble(0, i, 0));
+            expectedSeries.add(i+inpNum, expOutput.getDouble(i));
 
         return expectedSeries;
     }

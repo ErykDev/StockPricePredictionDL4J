@@ -27,27 +27,20 @@ public class Core {
         network.init();
 
         StockCSVDataSetFetcher dataSetFetcher = new StockCSVDataSetFetcher(csvFile, inpNum, outNum);
-
-        BaseDatasetIterator datasetIterator = new BaseDatasetIterator(1, dataSetFetcher.totalExamples(), new StockCSVDataSetFetcher(csvFile, inpNum, outNum));
+        BaseDatasetIterator datasetIterator = new BaseDatasetIterator(4, dataSetFetcher.totalExamples(), new StockCSVDataSetFetcher(csvFile, inpNum, outNum));
+        normalizer.fit(datasetIterator);
         datasetIterator.setPreProcessor(normalizer);
 
         uiServerComponent.reinitialize(network);
 
-        int epochNum = 1000;
+        int epochNum = 250;
 
         for (int i = 0; i < epochNum; i++) {
-            double lr = calcLearningRate(i);
-
-            network.setLearningRate(lr);
             network.fit(datasetIterator);
             log.info(String.format("Epoch: %s", i));
 
             System.gc();
         }
         network.save(new File("network.zip"));
-    }
-
-    private static double calcLearningRate(int epochNum){
-        return epochNum <= 700 ? 1e-3 : 1e-4;
     }
 }
