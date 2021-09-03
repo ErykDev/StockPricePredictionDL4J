@@ -15,7 +15,7 @@ import org.nd4j.linalg.lossfunctions.LossFunctions;
 public class NeuralNetwork {
     //create the neural network
     public static MultiLayerNetwork getNetModel(int inputNum, int outNum) {
-        int hiddenLayerNum = 50;
+        int hiddenLayerNum = 100;
 
         MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder()
                 .trainingWorkspaceMode(WorkspaceMode.ENABLED).inferenceWorkspaceMode(WorkspaceMode.ENABLED)

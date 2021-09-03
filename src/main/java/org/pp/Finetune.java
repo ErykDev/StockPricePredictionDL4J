@@ -33,7 +33,7 @@ public class Finetune {
 
         uiServerComponent.reinitialize(network);
 
-        int epochNum = 250;
+        int epochNum = 500;
 
         for (int i = 0; i < epochNum; i++) {
             network.fit(datasetIterator);

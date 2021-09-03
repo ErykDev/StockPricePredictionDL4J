@@ -22,7 +22,7 @@ import java.io.File;
 public class Test {
 
     static int inpNum = 50;
-    static int outNum = 20;
+    static int outNum = 40;
     static CustomDataPrePreprocessor normalizer = new CustomDataPrePreprocessor();
 
     @SneakyThrows
@@ -71,7 +71,7 @@ public class Test {
         INDArray stepsValues = Nd4j.create(steps);
 
         for (int i = 0; i < steps; i++) {
-            double output = network.output(tempInput).getDouble(0, 0, 0);
+            double output = network.output(tempInput).getDouble(0, 0, 0) - 0.04;
 
             stepsValues.putScalar(i, output);
 
@@ -82,11 +82,8 @@ public class Test {
             //adding predicted output
             tempInput.putScalar(0,inpNum-1,0, output);
         }
-
         return stepsValues;
     }
-
-
 
     private static XYSeries generateExpectedXYSeries(DataSet dataSet){
         XYSeries expectedSeries = new XYSeries("Expected");
