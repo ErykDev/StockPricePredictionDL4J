@@ -41,7 +41,7 @@ public class Test {
 
         DataSet dataSet = datasetIterator.next();
 
-        INDArray output = getPredictionSteps(network, dataSet.getFeatures(), outNum);
+        INDArray output = predictSteps(network, dataSet.getFeatures(), outNum);
 
         normalizer.revert(dataSet);
         output = normalizer.revert(output);
@@ -66,8 +66,7 @@ public class Test {
         ChartUtilities.saveChartAsJPEG( XYChart, xylineChart, width, height);
     }
 
-    private static INDArray getPredictionSteps(MultiLayerNetwork network, INDArray input, int steps){
-
+    private static INDArray predictSteps(MultiLayerNetwork network, INDArray input, int steps){
         INDArray tempInput = input.dup();
         INDArray stepsValues = Nd4j.create(steps);
 
