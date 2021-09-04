@@ -22,8 +22,8 @@ import java.io.File;
 public class Test {
 
     static int inpNum = 50;
-    static int outNum = 40;
-    static double outputNorm = 0.04;
+    static int outNum = 20;
+    static double outputNorm;
     static CustomDataPrePreprocessor normalizer = new CustomDataPrePreprocessor();
 
     @SneakyThrows
@@ -53,18 +53,18 @@ public class Test {
 
 
         JFreeChart xylineChart = ChartFactory.createXYLineChart(
-                "NSE-TATAGLOBAL" ,
-                "X" ,
-                "Price" ,
-                dataset ,
-                PlotOrientation.VERTICAL ,
-                true , true , false);
+                "NSE-TATAGLOBAL",
+                "Days",
+                "Price",
+                dataset,
+                PlotOrientation.VERTICAL,
+                true, true, false);
 
 
         int width = 640;   /* Width of the image */
         int height = 480;  /* Height of the image */
         File XYChart = new File( "Results.png" );
-        ChartUtilities.saveChartAsJPEG( XYChart, xylineChart, width, height);
+        ChartUtilities.saveChartAsPNG(XYChart, xylineChart, width, height);
     }
 
     private static INDArray predictSteps(MultiLayerNetwork network, INDArray input, int steps){
@@ -72,7 +72,14 @@ public class Test {
         INDArray stepsValues = Nd4j.create(steps);
 
         for (int i = 0; i < steps; i++) {
-            double output = network.output(tempInput).getDouble(0, 0, 0) - outputNorm;
+
+            //calc outputNorm value
+            if (i == 0){
+                double output = network.output(tempInput).getDouble(0, 0);
+                outputNorm = Math.round(Math.abs(output - input.getDouble(0, inpNum - 1, 0)) * 100.0) / 100.0;
+            }
+
+            double output = network.output(tempInput).getDouble(0, 0) - outputNorm;
 
             stepsValues.putScalar(i, output);
 
@@ -95,7 +102,7 @@ public class Test {
         for (int i = 0; i < inpNum; i++)
             expectedSeries.add(i, expInput.getDouble(0, i, 0));
         for (int i = 0; i < outNum; i++)
-            expectedSeries.add(i+inpNum, expOutput.getDouble(0, i, 0));
+            expectedSeries.add(i+inpNum, expOutput.getDouble(0, i));
 
         return expectedSeries;
     }
