@@ -85,7 +85,6 @@ public class StockCSVDataSetFetcher implements DataSetFetcher {
             INDArray input = Nd4j.create(1, inputColumns, 1);
             INDArray output = Nd4j.create(1, totalOutcomes, 1);
 
-            //2013-02-08,45.07,45.35,45.0,45.08,1824755,A
             for (int j = 0; j < inputColumns; j++){
                 double val = Double.parseDouble(allLines.get(ReaderCursor + j + i).split(",")[5]);
 

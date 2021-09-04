@@ -23,6 +23,7 @@ public class Test {
 
     static int inpNum = 50;
     static int outNum = 40;
+    static double outputNorm = 0.04;
     static CustomDataPrePreprocessor normalizer = new CustomDataPrePreprocessor();
 
     @SneakyThrows
@@ -62,7 +63,7 @@ public class Test {
 
         int width = 640;   /* Width of the image */
         int height = 480;  /* Height of the image */
-        File XYChart = new File( "Results.jpeg" );
+        File XYChart = new File( "Results.png" );
         ChartUtilities.saveChartAsJPEG( XYChart, xylineChart, width, height);
     }
 
@@ -71,7 +72,7 @@ public class Test {
         INDArray stepsValues = Nd4j.create(steps);
 
         for (int i = 0; i < steps; i++) {
-            double output = network.output(tempInput).getDouble(0, 0, 0) - 0.04;
+            double output = network.output(tempInput).getDouble(0, 0, 0) - outputNorm;
 
             stepsValues.putScalar(i, output);
 
