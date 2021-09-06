@@ -11,7 +11,7 @@ Model trained on NSE-TATAGLOBAL is avilable [here](https://drive.google.com/file
 
 ### Training
 * If you wish to use your own data simply paste it into the project folder in csv format if you have a custom csv edit StockCSVDataSetFetcher.java
-* The project is using a csv data-format. See example [here](https://github.com/BadlyDrunkScotsman/StockPricesPredictionDL4J/blob/main/NSE-TATAGLOBAL.csv)
+* The project is using a csv data-format. See [example](https://github.com/BadlyDrunkScotsman/StockPricesPredictionDL4J/blob/main/NSE-TATAGLOBAL.csv)
 
 ### Contributing
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
