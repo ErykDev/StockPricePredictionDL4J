@@ -22,6 +22,7 @@ public class NeuralNetwork {
                 .trainingWorkspaceMode(WorkspaceMode.ENABLED).inferenceWorkspaceMode(WorkspaceMode.ENABLED)
                 .optimizationAlgo(OptimizationAlgorithm.STOCHASTIC_GRADIENT_DESCENT)
                 .weightInit(WeightInit.XAVIER)
+                //.seed(1630946263486L)
                 .updater(new RmsProp(0.0001))
                 .list()
 

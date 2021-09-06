@@ -23,7 +23,7 @@ import java.io.File;
 public class Test {
 
     static int inpNum = 50;
-    static int outNum = 20;
+    static int outNum = 25;
 
     static CustomDataPrePreprocessor normalizer = new CustomDataPrePreprocessor();
 
