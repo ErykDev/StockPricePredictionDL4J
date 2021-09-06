@@ -1,7 +1,7 @@
 ## StockPricesPredictionDL4J
 Lstm based stock price predicting
 
-[![Example result](https://github.com/BadlyDrunkScotsman/StockPricesPredictionDL4J/blob/main/Results.png)]
+[Example result](https://github.com/BadlyDrunkScotsman/StockPricesPredictionDL4J/blob/main/Results.png)
 
 ### How to run
 * Import project dependencies with Gradle
