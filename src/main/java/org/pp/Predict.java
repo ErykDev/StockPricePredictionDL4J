@@ -18,10 +18,13 @@ import org.pp.data.CustomDataPrePreprocessor;
 import org.pp.data.StockCSVDataSetFetcher;
 
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 @Slf4j
-public class Test {
-
+public class Predict {
     static int inpNum = 50;
     static int outNum = 25;
 
@@ -29,32 +32,28 @@ public class Test {
 
     @SneakyThrows
     public static void main(String[] args) {
-        File csvFile = new File("NSE-TATAGLOBAL.csv");
-
-        MultiLayerNetwork network = MultiLayerNetwork.load(new File("network.zip"), true);
-        network.init();
-
+        File csvFile = new File("NSE-TATAGLOBAL.csv"); //data for normalization scale
         StockCSVDataSetFetcher dataSetFetcher = new StockCSVDataSetFetcher(csvFile, inpNum, outNum);
 
         BaseDatasetIterator datasetIterator = new BaseDatasetIterator(1, dataSetFetcher.totalExamples(), new StockCSVDataSetFetcher(csvFile, inpNum, outNum));
         normalizer.fit(datasetIterator);
-        datasetIterator.setPreProcessor(normalizer);
 
 
-        DataSet dataSet = datasetIterator.next();
+        MultiLayerNetwork network = MultiLayerNetwork.load(new File("network.zip"), true);
+        network.init();
 
-        INDArray output = predictSteps(network, dataSet.getFeatures(), outNum);
+        double[] data = readData();
 
-        RegressionEvaluation regressionEvaluation = new RegressionEvaluation();
-        regressionEvaluation.eval(dataSet.getLabels(), output);
+        INDArray features = Nd4j.create(data, 1, data.length, 1);
 
-        log.info("\n"+regressionEvaluation.stats());
+        features = normalizer.preProcess(features);
 
-        normalizer.revert(dataSet);
+        INDArray output = predictSteps(network, features, outNum);
+
         output = normalizer.revert(output);
 
         final XYSeriesCollection dataset = new XYSeriesCollection();
-        dataset.addSeries(generateExpectedXYSeries(dataSet));
+        dataset.addSeries(generateExpectedXYSeries(data));
         dataset.addSeries(generateOutputXYSeries(output));
 
 
@@ -69,8 +68,22 @@ public class Test {
 
         int width = 640;   /* Width of the image */
         int height = 480;  /* Height of the image */
-        File XYChart = new File( "Test.png" );
+        File XYChart = new File( "Predict.png" );
         ChartUtilities.saveChartAsPNG(XYChart, xylineChart, width, height);
+    }
+
+    @SneakyThrows
+    private static double[] readData(){
+        double[] data = new double[inpNum];
+
+        ArrayList<String> allLines = Files.lines(Paths.get("NSE-TATAGLOBAL.csv"))
+                .skip(1) // skipping csv headers
+                .collect(Collectors.toCollection(ArrayList::new));
+
+        for (int i = 0; i < inpNum; i++)
+            data[i] = Double.parseDouble(allLines.get(i).split(",")[5]);
+
+        return data;
     }
 
     private static INDArray predictSteps(MultiLayerNetwork network, INDArray input, int steps){
@@ -85,7 +98,6 @@ public class Test {
                 outputNorm = calcOutputNorm(network, tempInput);
 
             double output = network.output(tempInput).getDouble(0, 0) - outputNorm;
-            //double output = network.output(tempInput).getDouble(0, 0);
 
             stepsValues.putScalar(0, i, output);
 
@@ -103,16 +115,11 @@ public class Test {
         return Math.round(Math.abs(network.output(input).getDouble(0, 0) - input.getDouble(0, inpNum - 1, 0)) * 100.0) / 100.0;
     }
 
-    private static XYSeries generateExpectedXYSeries(DataSet dataSet){
-        XYSeries expectedSeries = new XYSeries("Expected");
-
-        INDArray expInput = dataSet.getFeatures();
-        INDArray expOutput= dataSet.getLabels();
+    private static XYSeries generateExpectedXYSeries(double[] data){
+        XYSeries expectedSeries = new XYSeries("Input");
 
         for (int i = 0; i < inpNum; i++)
-            expectedSeries.add(i, expInput.getDouble(0, i, 0));
-        for (int i = 0; i < outNum; i++)
-            expectedSeries.add(i+inpNum, expOutput.getDouble(0, i));
+            expectedSeries.add(i, data[i]);
 
         return expectedSeries;
     }

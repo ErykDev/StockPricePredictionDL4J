@@ -33,6 +33,17 @@ public class CustomDataPrePreprocessor implements DataSetPreProcessor {
         return toRevert.add(1.0).div(2.0).add(smallestNum).mul(biggestNum - smallestNum);
     }
 
+    public void fit(INDArray features){
+        double tempBiggestNum = features.maxNumber().doubleValue();
+        if (tempBiggestNum > biggestNum)
+            this.biggestNum = tempBiggestNum;
+
+        double tempSmallestNum = features.minNumber().doubleValue();
+
+        if (tempSmallestNum < smallestNum)
+            this.smallestNum = tempSmallestNum;
+    }
+
     public void fit(BaseDatasetIterator iterator){
         while (iterator.hasNext()) {
             DataSet dataSet = iterator.next();
