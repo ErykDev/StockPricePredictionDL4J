@@ -78,13 +78,12 @@ public class Test {
         INDArray stepsValues = Nd4j.create(1, steps);
 
         for (int i = 0; i < steps; i++) {
-            //calc outputNorm value
-            if (i == 0){
-                double output = network.output(tempInput).getDouble(0, 0);
-                outputNorm = Math.round(Math.abs(output - input.getDouble(0, inpNum - 1, 0)) * 100.0) / 100.0;
-            }
+            if (i == 0)
+                //calc outputNorm value
+                outputNorm = Math.round(Math.abs(network.output(tempInput).getDouble(0, 0) - input.getDouble(0, inpNum - 1, 0)) * 100.0) / 100.0;
 
             double output = network.output(tempInput).getDouble(0, 0) - outputNorm;
+            //double output = network.output(tempInput).getDouble(0, 0);
 
             stepsValues.putScalar(0, i, output);
 
