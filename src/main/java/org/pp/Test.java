@@ -112,7 +112,7 @@ public class Test {
         for (int i = 0; i < inpNum; i++)
             expectedSeries.add(i, expInput.getDouble(0, i, 0));
         for (int i = 0; i < outNum; i++)
-            expectedSeries.add(i+inpNum, expOutput.getDouble(0, i));
+            expectedSeries.add(i+(inpNum-1), expOutput.getDouble(0, i));
 
         return expectedSeries;
     }
