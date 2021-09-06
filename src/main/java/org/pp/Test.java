@@ -9,6 +9,7 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
+import org.nd4j.evaluation.regression.RegressionEvaluation;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.dataset.api.iterator.BaseDatasetIterator;
@@ -44,6 +45,11 @@ public class Test {
 
         INDArray output = predictSteps(network, dataSet.getFeatures(), outNum);
 
+        RegressionEvaluation regressionEvaluation = new RegressionEvaluation();
+        regressionEvaluation.eval(dataSet.getLabels(), output);
+
+        log.info("\n"+regressionEvaluation.stats());
+
         normalizer.revert(dataSet);
         output = normalizer.revert(output);
 
@@ -69,10 +75,9 @@ public class Test {
 
     private static INDArray predictSteps(MultiLayerNetwork network, INDArray input, int steps){
         INDArray tempInput = input.dup();
-        INDArray stepsValues = Nd4j.create(steps);
+        INDArray stepsValues = Nd4j.create(1, steps);
 
         for (int i = 0; i < steps; i++) {
-
             //calc outputNorm value
             if (i == 0){
                 double output = network.output(tempInput).getDouble(0, 0);
@@ -81,7 +86,7 @@ public class Test {
 
             double output = network.output(tempInput).getDouble(0, 0) - outputNorm;
 
-            stepsValues.putScalar(i, output);
+            stepsValues.putScalar(0, i, output);
 
             //moving array by 1 pos
             for (int j = 0; j < inpNum-1; j++)
@@ -111,7 +116,7 @@ public class Test {
         XYSeries expectedSeries = new XYSeries("Predicted");
 
         for (int i = 0; i < outNum; i++)
-            expectedSeries.add(i+inpNum, expOutput.getDouble(i));
+            expectedSeries.add(i+inpNum, expOutput.getDouble(0, i));
 
         return expectedSeries;
     }

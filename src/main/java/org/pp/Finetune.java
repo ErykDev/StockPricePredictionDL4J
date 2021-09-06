@@ -33,6 +33,8 @@ public class Finetune {
 
         uiServerComponent.reinitialize(network);
 
+        log.info(network.summary());
+
         int epochNum = 250;
 
         for (int i = 0; i < epochNum; i++) {
