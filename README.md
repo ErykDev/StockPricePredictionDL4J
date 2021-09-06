@@ -1,5 +1,5 @@
 ## StockPricesPredictionDL4J
-Lstm based stock price predicting
+Lstm based stock price prediction
 
 ![Example result](https://github.com/BadlyDrunkScotsman/StockPricesPredictionDL4J/blob/main/Test.png)
 
