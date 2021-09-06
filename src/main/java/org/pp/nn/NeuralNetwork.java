@@ -45,6 +45,11 @@ public class NeuralNetwork {
                         .nIn(hiddenLayerNum)
                         .nOut(hiddenLayerNum).build())
 
+                .layer(new DenseLayer.Builder().name("Dense2")
+                        .activation(Activation.IDENTITY)
+                        .nIn(hiddenLayerNum)
+                        .nOut(hiddenLayerNum).build())
+
                 .layer(new OutputLayer.Builder(LossFunctions.LossFunction.MSE)
                         .activation(Activation.IDENTITY)
                         .nIn(hiddenLayerNum)

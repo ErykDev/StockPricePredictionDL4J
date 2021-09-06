@@ -24,7 +24,7 @@ public class Test {
 
     static int inpNum = 50;
     static int outNum = 20;
-    static double outputNorm;
+
     static CustomDataPrePreprocessor normalizer = new CustomDataPrePreprocessor();
 
     @SneakyThrows
@@ -77,10 +77,12 @@ public class Test {
         INDArray tempInput = input.dup();
         INDArray stepsValues = Nd4j.create(1, steps);
 
+        double outputNorm = 0.0;
+
         for (int i = 0; i < steps; i++) {
             if (i == 0)
                 //calc outputNorm value
-                outputNorm = Math.round(Math.abs(network.output(tempInput).getDouble(0, 0) - input.getDouble(0, inpNum - 1, 0)) * 100.0) / 100.0;
+                outputNorm = calcOutputNorm(network, tempInput);
 
             double output = network.output(tempInput).getDouble(0, 0) - outputNorm;
             //double output = network.output(tempInput).getDouble(0, 0);
@@ -95,6 +97,10 @@ public class Test {
             tempInput.putScalar(0,inpNum-1,0, output);
         }
         return stepsValues;
+    }
+
+    private static double calcOutputNorm(MultiLayerNetwork network, INDArray input){
+        return Math.round(Math.abs(network.output(input).getDouble(0, 0) - input.getDouble(0, inpNum - 1, 0)) * 100.0) / 100.0;
     }
 
     private static XYSeries generateExpectedXYSeries(DataSet dataSet){
