@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class Predict {
     static int inpNum = 50;
-    static int outNum = 25;
+    static int outNum = 1;
 
     static CustomDataPrePreprocessor normalizer = new CustomDataPrePreprocessor();
 
