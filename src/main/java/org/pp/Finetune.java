@@ -18,7 +18,7 @@ public class Finetune {
 
         UIServerComponent uiServerComponent = new UIServerComponent();
 
-        File csvFile = new File("NSE-TATAGLOBAL.csv");
+        File csvFile = new File("EURUSD_FX.csv");
 
         int inpNum = 50;
         int outNum = 1;
@@ -35,7 +35,7 @@ public class Finetune {
 
         log.info(network.summary());
 
-        int epochNum = 250;
+        int epochNum = 70;
 
         for (int i = 0; i < epochNum; i++) {
             network.fit(datasetIterator);
