@@ -120,7 +120,7 @@ public class StockCSVDataSetFetcher implements DataSetFetcher {
     }
 
     private int calcTotalExamples() {
-        return lineCount - (inputColumns + totalOutcomes + 64);
+        return lineCount - (inputColumns + totalOutcomes + 200);
     }
 
     @Override
