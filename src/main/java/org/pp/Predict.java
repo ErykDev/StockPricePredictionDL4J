@@ -30,7 +30,7 @@ public class Predict {
 
     @SneakyThrows
     public static void main(String[] args) {
-        File csvFile = new File("NSE-TATAGLOBAL.csv"); //data for normalization scale
+        File csvFile = new File("EURUSD_FX.csv"); //data for normalization scale
         StockCSVDataSetFetcher dataSetFetcher = new StockCSVDataSetFetcher(csvFile, inpNum, outNum);
 
         BaseDatasetIterator datasetIterator = new BaseDatasetIterator(1, dataSetFetcher.totalExamples(), new StockCSVDataSetFetcher(csvFile, inpNum, outNum));
@@ -40,18 +40,17 @@ public class Predict {
         MultiLayerNetwork network = MultiLayerNetwork.load(new File("network.zip"), true);
         network.init();
 
-        double[] data = readData();
-
-        INDArray features = Nd4j.create(data, 1, data.length, 1);
+        INDArray features = readData();
 
         features = normalizer.preProcess(features);
 
         INDArray output = predictSteps(network, features, outNum);
 
+        features = normalizer.revert(features);
         output = normalizer.revert(output);
 
         final XYSeriesCollection dataset = new XYSeriesCollection();
-        dataset.addSeries(generateExpectedXYSeries(data));
+        dataset.addSeries(generateExpectedXYSeries(features));
         dataset.addSeries(generateOutputXYSeries(output));
 
 
@@ -71,17 +70,25 @@ public class Predict {
     }
 
     @SneakyThrows
-    private static double[] readData(){
-        double[] data = new double[inpNum];
+    private static INDArray readData(){
+        INDArray input = Nd4j.create(3, inpNum, 1);
 
-        ArrayList<String> allLines = Files.lines(Paths.get("NSE-TATAGLOBAL.csv"))
+        ArrayList<String> allLines = Files.lines(Paths.get("EURUSD_FX.csv"))
                 .skip(1) // skipping csv headers
+                .map(s -> s.replace("\"","").replace(",","."))
                 .collect(Collectors.toCollection(ArrayList::new));
 
-        for (int i = 0; i < inpNum; i++)
-            data[i] = Double.parseDouble(allLines.get(i).split(",")[5]);
+        for (int j = 0; j < inpNum; j++){
+            double valOpen = Double.parseDouble(allLines.get(j).split(";")[2]);
+            double valMin = Double.parseDouble(allLines.get(j).split(";")[4]);
+            double valMax = Double.parseDouble(allLines.get(j).split(";")[3]);
 
-        return data;
+            input.putScalar(2, j,0, valOpen);
+            input.putScalar(1, j,0, valMax);
+            input.putScalar(0, j,0, valMin);
+        }
+
+        return input;
     }
 
     private static INDArray predictSteps(MultiLayerNetwork network, INDArray input, int steps){
@@ -113,11 +120,11 @@ public class Predict {
         return Math.round(Math.abs(network.output(input).getDouble(0, 0) - input.getDouble(0, inpNum - 1, 0)) * 100.0) / 100.0;
     }
 
-    private static XYSeries generateExpectedXYSeries(double[] data){
+    private static XYSeries generateExpectedXYSeries(INDArray data){
         XYSeries expectedSeries = new XYSeries("Input");
 
         for (int i = 0; i < inpNum; i++)
-            expectedSeries.add(i, data[i]);
+            expectedSeries.add(i, data.getDouble(0, i, 0));
 
         return expectedSeries;
     }

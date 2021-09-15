@@ -12,7 +12,7 @@ public class CustomDataPrePreprocessor implements DataSetPreProcessor {
     double biggestNum = 0.0;
 
     @Getter
-    double smallestNum = 0.0;
+    double smallestNum = 10e+10;
 
     @Override
     public void preProcess(DataSet toPreProcess) {
