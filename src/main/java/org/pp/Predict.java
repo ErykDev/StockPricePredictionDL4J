@@ -55,7 +55,7 @@ public class Predict {
 
 
         JFreeChart xylineChart = ChartFactory.createXYLineChart(
-                "NSE-TATAGLOBAL",
+                "EURUSD_FX",
                 "Days",
                 "Price",
                 dataset,
