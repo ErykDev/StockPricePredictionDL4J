@@ -59,7 +59,7 @@ public class Test {
 
 
         JFreeChart xylineChart = ChartFactory.createXYLineChart(
-                "NSE-TATAGLOBAL",
+                "EURUSD_FX",
                 "Days",
                 "Price",
                 dataset,
