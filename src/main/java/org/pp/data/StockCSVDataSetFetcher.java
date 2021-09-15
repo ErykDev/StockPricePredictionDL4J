@@ -1,6 +1,7 @@
 package org.pp.data;
 
 import lombok.SneakyThrows;
+import org.mapdb.Atomic;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.dataset.DataSet;
 
@@ -10,6 +11,7 @@ import java.io.FileReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.nd4j.linalg.dataset.api.iterator.fetcher.DataSetFetcher;
@@ -47,6 +49,7 @@ public class StockCSVDataSetFetcher implements DataSetFetcher {
 
         this.allLines = Files.lines(Paths.get(csvFile.getPath()))
                 .skip(1) // skipping csv headers
+                .map(s -> s.replace("\"","").replace(",","."))
                 .collect(Collectors.toCollection(ArrayList::new));
     }
 
@@ -82,19 +85,29 @@ public class StockCSVDataSetFetcher implements DataSetFetcher {
         fetch.clear();
 
         for (int i = 0; i < numExamples; i++) {
-            INDArray input = Nd4j.create(1, inputColumns, 1);
-            INDArray output = Nd4j.create(1, totalOutcomes);
+            INDArray input = Nd4j.create(3, inputColumns, 1);
+            INDArray output = Nd4j.create(3, totalOutcomes);
 
             for (int j = 0; j < inputColumns; j++){
-                double val = Double.parseDouble(allLines.get(ReaderCursor + j + i).split(",")[5]);
+                double valOpen = Double.parseDouble(allLines.get(ReaderCursor + j + i).split(";")[2]);
+                double valMin = Double.parseDouble(allLines.get(ReaderCursor + j + i).split(";")[4]);
+                double valMax = Double.parseDouble(allLines.get(ReaderCursor + j + i).split(";")[3]);
 
-                input.putScalar(0, j,0, val);
+                input.putScalar(2, j,0, valOpen);
+                input.putScalar(1, j,0, valMax);
+                input.putScalar(0, j,0, valMin);
             }
 
             for (int z = 0; z < totalOutcomes; z++){
-                double val = Double.parseDouble(allLines.get(ReaderCursor + inputColumns + z + i).split(",")[5]);
+                // double val = Double.parseDouble(allLines.get(ReaderCursor + inputColumns + z + i).split(",")[2]);
 
-                output.putScalar(0, z, val);
+                double valOpen = Double.parseDouble(allLines.get(ReaderCursor + inputColumns + z + i).split(";")[2]);
+                double valMin = Double.parseDouble(allLines.get(ReaderCursor + inputColumns + z + i).split(";")[4]);
+                double valMax = Double.parseDouble(allLines.get(ReaderCursor + inputColumns + z + i).split(";")[3]);
+
+                output.putScalar(2, z, valOpen);
+                output.putScalar(1, z, valMin);
+                output.putScalar(0, z, valMax);
             }
 
             fetch.add(new DataSet(input, output));
@@ -120,7 +133,7 @@ public class StockCSVDataSetFetcher implements DataSetFetcher {
     }
 
     private int calcTotalExamples() {
-        return lineCount - (inputColumns + totalOutcomes + 200);
+        return lineCount - (inputColumns + totalOutcomes + 64);
     }
 
     @Override
