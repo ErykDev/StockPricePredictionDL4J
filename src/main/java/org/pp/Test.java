@@ -29,7 +29,7 @@ public class Test {
 
     @SneakyThrows
     public static void main(String[] args) {
-        File csvFile = new File("NSE-TATAGLOBAL.csv");
+        File csvFile = new File("EURUSD_FX.csv");
 
         MultiLayerNetwork network = MultiLayerNetwork.load(new File("network.zip"), true);
         network.init();
